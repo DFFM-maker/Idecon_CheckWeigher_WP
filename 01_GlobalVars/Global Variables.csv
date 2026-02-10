@@ -1,0 +1,69 @@
+Name,DataType,InitialValue,AT,Retain,Constant,Network Publish,Comment
+HMI_AxisSetUp,D_AxisSetUp,,%D0,TRUE,FALSE,Publish Only,
+HMI_MachineSetUp,D_SetUpMachine,,%D3000,TRUE,FALSE,Publish Only,
+HMI_RecipeMachine,D_RecipeMachine,,%D6000,TRUE,FALSE,Publish Only,
+HMI_NoRecipeMachine,D_NoRecipeMachine,,%D9000,TRUE,FALSE,Publish Only,
+HMI_AxisOnLineData,D_AxisOnLineData,,%D12000,TRUE,FALSE,Publish Only,
+HMI_OnLineData,D_OnLineData,,%D15000,TRUE,FALSE,Publish Only,
+HMI_OnlineStatistics,D_OnlineStatistics,,%D18000,TRUE,FALSE,Publish Only,
+HMI_Alarms,D_Alarms,,%D20000,TRUE,FALSE,Publish Only,
+HMI_ErrorMark,D_ErrorMark,,%D21000,TRUE,FALSE,Publish Only,
+HMI_EjectionLog,D_LogEjection,,%D21100,TRUE,FALSE,Publish Only,
+HMI_CrownLog,D_LogCrown,,%D21200,TRUE,FALSE,Publish Only,
+HMI_OutPutEjectionLog,D_LogOutPutConveyorEjection,,%D21300,TRUE,FALSE,Publish Only,
+HMI_RecipeName,ARRAY[1..40] OF D_RecipeName,,%D22000,TRUE,FALSE,Publish Only,
+HMI_RowsCode,D_RowsCode,,%D25000,TRUE,FALSE,Publish Only,
+HMI_OffLineRecipeMachine,D_OffLineRecipeMachine,,%D26000,TRUE,FALSE,Publish Only,
+RecipeArchives,ARRAY[1..40] OF D_RecipeMachine,,,TRUE,FALSE,Do not publish,
+IndexEnum,Axis_Index,,,FALSE,FALSE,Do not publish,
+AXIS,ARRAY[0..65] OF AxisComandStatus,,,FALSE,FALSE,Do not publish,
+AXIS_DUAL,ARRAY[1..12] OF DualAxisCommandStatus,,,FALSE,FALSE,Do not publish,
+PICK_PLACE_GANTRY,ARRAY[1..3] OF Gantry,,,FALSE,FALSE,Do not publish,
+INVERTER,ARRAY[40..89] OF InverterComandStatus,,,FALSE,FALSE,Do not publish,
+THERMOREGULATOR,ARRAY[1..20] OF TermoregolationPIDAT,,,TRUE,FALSE,Do not publish,
+FLAG,FlagCommon,,,FALSE,FALSE,Do not publish,
+SYSTEM,SystemDataSetting,,,TRUE,FALSE,Do not publish,
+SEQUENCE,SequenceStructures,,,FALSE,FALSE,Do not publish,
+NX90_InPut,InPut_90,,,FALSE,FALSE,Do not publish,
+NX91_InPut,InPut_91,,,FALSE,FALSE,Do not publish,
+NX90_OutPut,OutPut_90,,,FALSE,FALSE,Do not publish,
+NX91_OutPut,OutPut_91,,,FALSE,FALSE,Do not publish,
+NJ_OutPutEthernet,OutPut_ETHERNET,,,FALSE,FALSE,Do not publish,
+NJ_InPutEthernet,InPut_ETHERNET,,,FALSE,FALSE,Do not publish,
+InPutEthernetIP,ARRAY[0..2000] OF WORD_UNION,,%E0_0000,TRUE,FALSE,Do not publish,
+OutPutEthernetIP,ARRAY[0..2000] OF WORD_UNION,,%E0_5000,TRUE,FALSE,Do not publish,
+CAMERA_InPut,InPut_ETHERNET_FH,,,FALSE,FALSE,Input,
+CAMERA_OutPut,OutPut_ETHERNET_FH,,,FALSE,FALSE,Output,
+MES_InPutOutPutEthernetIP,MES,,,TRUE,FALSE,Publish Only,
+NX_SAFE_InPut,SafeInPut,,,FALSE,FALSE,Do not publish,
+NX_SAFE_OutPut,SafeOutPut,,,FALSE,FALSE,Do not publish,
+TERMINAL,Event,,,FALSE,FALSE,Do not publish,
+Pack_ML,ARRAY[0..255] OF PackML,,,FALSE,FALSE,Publish Only,
+D_Recipes,ARRAY[0..40] OF D_ScadaRecipe,,%E3_1000,TRUE,FALSE,Publish Only,
+TimeZoneAndDLS_DateTime,DATE_AND_TIME,,,FALSE,FALSE,Do not publish,
+ScadaInterface,ST_ScadaInterface,,,TRUE,FALSE,Publish Only,Definitive NJ structure for all communication with the SCADA system via OPC UA
+ScadaLogs,ST_Logs_Message,,,TRUE,FALSE,Publish Only,
+MachineAnalytics,DT_MachineAnalytics_Master,,%E4_0000,TRUE,FALSE,Publish Only,Master structure for all HMI/SCADA analytics data
+ResetType,INT,0,,FALSE,FALSE,Do not publish,"0 = reset su cambio ricetta, 1 = reset su cambio lotto"
+RecipeLog,LogEvent,,,TRUE,FALSE,Do not publish,
+ArchiveHistory,ARRAY[0..99] OF ST_ArchiveEntry,,,TRUE,FALSE,Do not publish,Buffer storico unico (100 record)
+ArchiveHistory_Index,INT,,,FALSE,FALSE,Do not publish,"Inizia da -1, così il primo salvataggio scrive in posizione"
+HMI_RecipeSave,ARRAY[1..40] OF D_RecipeSave,,%E3_0200,TRUE,FALSE,Publish Only,
+G_Idecon_Config,_sSOCKET_ADDRESS,"(PortNo := 50000, IpAdr := '172.16.224.200')",,FALSE,FALSE,Do not publish,Configurazione dell'indirizzo e della porta di destinazione della pesatrice.
+G_ProgressiveID,UDINT,0,,FALSE,FALSE,Do not publish,Contatore progressivo interno delle pesate.
+G_System_Error,BOOL,FALSE,,FALSE,FALSE,Do not publish,Flag di errore generale comunicazione.
+G_Idecon_MsgFilter,UINT,17,,FALSE,FALSE,Do not publish,Bitmask MSGFILTER (17=risposte+pesate).
+G_Idecon_LastSTATSV,STRING[16],',,FALSE,FALSE,Do not publish,Ultimo valore STATSV ricevuto.
+G_Idecon_WorkMode,eIdecon_WorkMode,WM_LOCAL,,FALSE,FALSE,Publish Only,Modalità lavoro ricavata da STATSV.
+G_Idecon_LastWeight,Idecon_WeightData,,,FALSE,FALSE,Publish Only,Ultima pesata ricevuta (WEIGHT).
+G_Idecon_StatP,Idecon_StatPData,,,FALSE,FALSE,Publish Only,Ultime statistiche ricevute (STATP).
+G_Idecon_BatchCode,STRING[64],',,FALSE,FALSE,Do not publish,Codice lotto da impostare (BATCHMODIFY).
+G_Idecon_ProductionOrder,STRING[64],',,FALSE,FALSE,Do not publish,Ordine produzione da impostare (BATCHMODIFY).
+G_Idecon_Operator,STRING[64],',,FALSE,FALSE,Do not publish,Operatore da impostare (BATCHMODIFY).
+G_OPCUA_Idecon,ST_OPCUA_Idecon,,,FALSE,FALSE,Publish Only,Oggetto OPC UA per pubblicazione pesate e stato.
+G_Idecon_HMI_Cmd,ST_Idecon_ManualCmd,,,FALSE,FALSE,Do not publish,Gestione comandi manuali da HMI
+G_Test_Ejector_Start,BOOL,,,FALSE,FALSE,Do not publish,Avvia test: Legge config attuale e disabilita eiettore
+G_Test_Ejector_Restore,BOOL,,,FALSE,FALSE,Do not publish,Fine test: Ripristina valori salvati
+G_Test_Ejector_State,INT,0,,FALSE,FALSE,Do not publish,"Stato Test (0=Idle, 10=Reading, 20=Disabled/Testing)"
+G_Test_Saved_Offset,STRING[32],',,FALSE,FALSE,Do not publish,Offset salvato da GETFROMRECIPE
+G_Test_Saved_Duration,STRING[32],',,FALSE,FALSE,Do not publish,Durata salvata da GETFROMRECIPE
