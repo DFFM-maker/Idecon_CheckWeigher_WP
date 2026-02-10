@@ -67,3 +67,5 @@ G_Test_Ejector_Restore,BOOL,,,FALSE,FALSE,Do not publish,Fine test: Ripristina v
 G_Test_Ejector_State,INT,0,,FALSE,FALSE,Do not publish,"Stato Test (0=Idle, 10=Reading, 20=Disabled/Testing)"
 G_Test_Saved_Offset,STRING[32],',,FALSE,FALSE,Do not publish,Offset salvato da GETFROMRECIPE
 G_Test_Saved_Duration,STRING[32],',,FALSE,FALSE,Do not publish,Durata salvata da GETFROMRECIPE
+G_Idecon_BatchStats,DT_Idecon_BatchStats,,,TRUE,FALSE,Publish Only,Batch statistics for IDECON checkweigher per lot
+G_Idecon_BatchConfig,DT_Idecon_BatchConfig,,,TRUE,FALSE,Publish Only,Batch configuration (weight limits)
