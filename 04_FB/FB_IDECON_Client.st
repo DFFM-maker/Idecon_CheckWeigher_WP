@@ -168,26 +168,25 @@ IF (stxPos >= 0) AND (etxPos > stxPos) THEN
 
         // 2. WEIGHT (Dati Pesata Completa)
         ELSIF IDECON_StartsWith(tempStr, 'WEIGHT=') THEN
-            // Rimuovi prefisso 'WEIGHT=' (7 char)
             tempStr := DELETE(tempStr, 7, 1);
-            
-			
-            // Estrazione campi separati da pipe '|'
+
+            // Formato: timestamp|[order]|[batch]|recipe|line|serial|weight_mg|delta|classification
+            // Campi vuoti (order/batch mancanti) vengono gestiti come stringhe vuote
             Weight.DateTimeText     := IDECON_FieldAt(tempStr, 1, '|');
             Weight.ProductionOrder  := IDECON_FieldAt(tempStr, 2, '|');
             Weight.BatchCode        := IDECON_FieldAt(tempStr, 3, '|');
             Weight.RecipeName       := IDECON_FieldAt(tempStr, 4, '|');
             Weight.LineCode         := IDECON_FieldAt(tempStr, 5, '|');
             Weight.SerialNumber     := IDECON_FieldAt(tempStr, 6, '|');
-            
-            // Conversione valori numerici (già in mg)
-            Weight.WeightMg         := STRING_TO_DINT(IDECON_FieldAt(tempStr, 7, '|')); 
-            Weight.DeltaToNominalMg := STRING_TO_DINT(IDECON_FieldAt(tempStr, 8, '|'));
-            
+
+            // Conversione valori numerici (gia in mg)
+            Weight.WeightMg         := STRING_TO_DINT(IDECON_FieldAt(tempStr, 7, '|'));
+            Weight.DeltaToNominalMg := IDECON_ParseHexDword(IDECON_FieldAt(tempStr, 8, '|'));
+
             // Conversione Classificazione (Esadecimale)
             Weight.Classification   := IDECON_ParseHexDword(IDECON_FieldAt(tempStr, 9, '|'));
-			
-            Weight.Valid := TRUE; // Segnala dati validi
+
+            Weight.Valid := TRUE;
 
         // 3. STATP (Statistiche Produzione)
         ELSIF IDECON_StartsWith(tempStr, 'STATP=') THEN

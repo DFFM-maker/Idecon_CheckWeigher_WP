@@ -79,9 +79,13 @@ class IdeconDashboard:
     
     def process_message(self, msg: str):
         """Processa messaggio e invia a client web"""
+        print(f"[DEBUG] Messaggio ricevuto: {msg[:60]}...")
+        
         if msg.startswith("WEIGHT="):
+            print(f"[DEBUG] Parsing WEIGHT...")
             weight = self.client.parse_weight(msg)
             if weight:
+                print(f"[DEBUG] Peso parsato: {weight.weight_g:.3f}g - Flags: {weight.get_active_flags()}")
                 # Aggiungi a storico
                 self.weights.append({
                     'timestamp': datetime.now().isoformat(),
@@ -101,6 +105,7 @@ class IdeconDashboard:
                     'weight': weight.to_dict(),
                     'total_count': len(self.weights)
                 })
+                print(f"[DEBUG] WebSocket inviato! Total pesi: {len(self.weights)}")
         
         elif msg.startswith("EVENT="):
             event = self.client.parse_event(msg)

@@ -49,7 +49,7 @@ RecipeLog,LogEvent,,,TRUE,FALSE,Do not publish,
 ArchiveHistory,ARRAY[0..99] OF ST_ArchiveEntry,,,TRUE,FALSE,Do not publish,Buffer storico unico (100 record)
 ArchiveHistory_Index,INT,,,FALSE,FALSE,Do not publish,"Inizia da -1, così il primo salvataggio scrive in posizione"
 HMI_RecipeSave,ARRAY[1..40] OF D_RecipeSave,,%E3_0200,TRUE,FALSE,Publish Only,
-G_Idecon_Config,_sSOCKET_ADDRESS,"(PortNo := 50000, IpAdr := '172.16.224.200')",,FALSE,FALSE,Do not publish,Configurazione dell'indirizzo e della porta di destinazione della pesatrice.
+G_Idecon_Config,_sSOCKET_ADDRESS,"(PortNo := 50000, IpAdr := '172.16.224.210')",,FALSE,FALSE,Do not publish,Configurazione dell'indirizzo e della porta di destinazione della pesatrice.
 G_ProgressiveID,UDINT,0,,FALSE,FALSE,Do not publish,Contatore progressivo interno delle pesate.
 G_System_Error,BOOL,FALSE,,FALSE,FALSE,Do not publish,Flag di errore generale comunicazione.
 G_Idecon_MsgFilter,UINT,17,,FALSE,FALSE,Do not publish,Bitmask MSGFILTER (17=risposte+pesate).

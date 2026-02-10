@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test WebSocket</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Test WebSocket IDECON</h1>
+    <div id="status">Connessione...</div>
+    <div id="counter">Pesi ricevuti: 0</div>
+    <div id="last">Ultimo peso: -</div>
+    <hr>
+    <div id="log"></div>
+    
+    <script>
+        const socket = io();
+        let count = 0;
+        
+        socket.on('connect', function() {
+            document.getElementById('status').innerHTML = '<span style="color: green;">Connesso!</span>';
+            addLog('Connesso al server');
+        });
+        
+        socket.on('disconnect', function() {
+            document.getElementById('status').innerHTML = '<span style="color: red;">Disconnesso</span>';
+            addLog('Disconnesso dal server');
+        });
+        
+        socket.on('new_weight', function(data) {
+            count++;
+            document.getElementById('counter').textContent = 'Pesi ricevuti: ' + count;
+            document.getElementById('last').textContent = 'Ultimo peso: ' + data.weight.weight_g + 'g';
+            addLog('Peso #' + data.total_count + ': ' + data.weight.weight_g + 'g - Flags: ' + data.weight.flags.join(', '));
+        });
+        
+        socket.on('status_update', function(data) {
+            addLog('Status: ' + data.status.work_mode + ' - ' + data.status.motor_running);
+        });
+        
+        function addLog(msg) {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.textContent = new Date().toLocaleTimeString() + ' - ' + msg;
+            log.insertBefore(entry, log.firstChild);
+        }
+    </script>
+</body>
+</html>
