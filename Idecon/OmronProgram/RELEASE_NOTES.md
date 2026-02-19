@@ -5,6 +5,63 @@ Protocollo: Idecon Checkweigher TCP (STX/ETX framing)
 
 ---
 
+## v1.2 — Watchdog RX Production-Aware
+**File:** `FB_IDECON_Client.st`
+**Baseline:** v1.1
+
+### Problema risolto
+Il watchdog RX (60s) scattava anche durante i periodi di fermo impianto, quando
+l'Idecon è in standby e non invia dati. Questo causava riconnessioni spurie
+(`Debug_State99Reason=1`, `Debug_WdogFireCount` alto) non legate a guasti reali.
+
+### Soluzione
+Il watchdog è ora **production-aware**: si attiva solo quando
+`IdeconInterface.Status.ProductionStarted = TRUE`.
+Il timeout è stato esteso da **T#60S** a **T#300S** (5 minuti) per tollerare
+brevi silenzi anche in produzione (es. STATSV infrequenti).
+
+### Logica watchdog v1.2
+
+```pascal
+// v1.1 (sempre attivo, 60s):
+tonWatchdog(IN := TRUE, PT := T#60S);
+
+// v1.2 (production-aware, 300s):
+IF IdeconInterface.Comm.RxCount <> LastRxCount THEN
+    LastRxCount := IdeconInterface.Comm.RxCount;
+    tonWatchdog(IN := FALSE);                          // dato ricevuto → reset timer
+ELSIF IdeconInterface.Status.ProductionStarted THEN
+    tonWatchdog(IN := TRUE, PT := T#300S);             // in produzione → conta 5 min
+    IF tonWatchdog.Q THEN
+        tonWatchdog(IN := FALSE);
+        Connected := FALSE;
+        Debug_State99Reason  := UINT#1;                // 1 = Watchdog
+        Debug_State99ErrorID := WORD#0;
+        Debug_State99Count   := Debug_State99Count + UDINT#1;
+        Debug_WdogFireCount  := Debug_WdogFireCount + UDINT#1;
+        State := 99;
+    END_IF;
+ELSE
+    tonWatchdog(IN := FALSE);                          // fermo → timer disabilitato
+END_IF;
+```
+
+### Fonte di `ProductionStarted`
+Valorizzata dal parser STATSV (già presente in v1.1):
+```pascal
+IdeconInterface.Status.ProductionStarted := MID(fieldStr, 1, 3) = '1';
+```
+
+### Riepilogo modifiche parametri watchdog
+
+| Parametro | v1.1 | v1.2 |
+|-----------|------|------|
+| Timeout | T#60S | T#300S |
+| Attivo durante fermo | Sì | No |
+| Condizione attivazione | sempre (State=1) | `ProductionStarted = TRUE` |
+
+---
+
 ## v1.1 — Fix State 99 Random
 **File:** `FB_IDECON_Client.st` + `Var_FB_IDECON_Client.st`
 **Baseline:** `FB_IDECON_Client funzionante.st` (v1.0)
@@ -112,8 +169,9 @@ END_IF;
 // Soft errors (benigni, informativi):
 // Debug_RcvSoftErrCount alto = normale in produzione (molti scan senza dati)
 
-// Watchdog fires (possibile se Idecon silenziosa > 60s):
+// Watchdog fires (possibile se Idecon silenziosa > 300s durante produzione):
 // Debug_WdogFireCount > 0 = verificare se Idecon invia STATSV regolarmente
+// Watchdog disabilitato automaticamente quando ProductionStarted = FALSE
 
 // Errori reali di connessione:
 // Debug_State99Reason = 2 (RcvError reale) o 3 (ConnectError)

@@ -674,22 +674,36 @@ CASE State OF
         IdeconInterface.Cmd.ErrorID := WORD_TO_UDINT(wSendErrorID);
     END_IF;
 
-    // --- WATCHDOG RX (60s senza dati → riconnetti) ---
+    // --- WATCHDOG RX (production-aware: attivo solo durante produzione) ---
+    // Logica:
+    //   1. Dati ricevuti in questo scan → reset watchdog (sempre, indipendente da produzione)
+    //   2. Nessun dato + produzione attiva (ProductionStarted=TRUE) → watchdog 5 min
+    //      Se scade: connessione TCP morta durante produzione → State 99
+    //   3. Nessun dato + produzione ferma/idle → watchdog disabilitato
+    //      (normale non ricevere dati quando la bilancia è in standby)
+    //
+    // ProductionStarted viene aggiornato dal parsing STATSV (bit 2 del campo status).
+    // Timeout 300s (5 min) invece di 60s: evita riconnessioni su pause brevi di produzione.
     IF IdeconInterface.Comm.RxCount <> LastRxCount THEN
+        // Dati ricevuti → reset watchdog
         LastRxCount := IdeconInterface.Comm.RxCount;
         tonWatchdog(IN := FALSE);
-    ELSE
-        tonWatchdog(IN := TRUE, PT := T#60S);
+    ELSIF IdeconInterface.Status.ProductionStarted THEN
+        // Produzione attiva ma nessun dato → watchdog 5 minuti
+        tonWatchdog(IN := TRUE, PT := T#300S);
         IF tonWatchdog.Q THEN
+            // Timeout scaduto durante produzione: connessione TCP morta → riconnetti
             tonWatchdog(IN := FALSE);
             Connected := FALSE;
-            // Diagnostica: registra motivo State 99
-            Debug_State99Reason  := UINT#1;   // 1 = Watchdog 60s
+            Debug_State99Reason  := UINT#1;   // 1 = Watchdog (produzione attiva, no dati)
             Debug_State99ErrorID := WORD#0;
             Debug_State99Count   := Debug_State99Count + UDINT#1;
             Debug_WdogFireCount  := Debug_WdogFireCount + UDINT#1;
             State := 99;
         END_IF;
+    ELSE
+        // Produzione ferma/idle → disabilita watchdog (silenzio è normale)
+        tonWatchdog(IN := FALSE);
     END_IF;
 
     // --- GESTIONE ERRORI ---
